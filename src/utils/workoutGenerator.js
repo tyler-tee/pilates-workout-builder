@@ -115,8 +115,10 @@ export const generateWorkout = (preferences) => {
   // Add exercises until we reach or exceed the target duration
   while (currentDuration < targetDuration && filteredExercises.length > 0) {
     // Select exercise that best fits remaining time
+    // To this (capture the currentDuration in a local constant):
+    const currentDur = currentDuration; // Capture value to avoid closure issues
     const idealExerciseIndex = filteredExercises.findIndex(ex => 
-      currentDuration + ex.duration <= targetDuration
+    currentDur + ex.duration <= targetDuration
     );
     
     const exerciseIndex = idealExerciseIndex !== -1 
