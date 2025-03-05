@@ -141,10 +141,14 @@ export const generateWorkout = (preferences) => {
     filteredExercises.splice(exerciseIndex, 1);
     
     // If we've run out of exercises but still have time, reuse exercises
-    if (filteredExercises.length === 0 && currentDuration < targetDuration) {
-      filteredExercises = [...selectedExercises];
+    if (filteredExercises.length === 0) {
+        // Create a safe copy of the value to avoid the closure issue
+        const remainingTime = targetDuration - currentDuration;
+        if (remainingTime > 0) {
+          filteredExercises = [...selectedExercises];
+        }
+      }
     }
-  }
   
   // Create workout object
   return {

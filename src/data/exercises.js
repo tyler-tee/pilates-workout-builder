@@ -721,3 +721,5 @@
       image: '🫁'
     },
   ];
+
+  export default exerciseDatabase;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ExerciseItem from './ExerciseItem';
 import WorkoutTimer from './WorkoutTimer';
-import { saveWorkout, deleteWorkout } from '../utils/storageUtils';
+import { saveWorkout } from '../utils/storageUtils';
 import { bodyAreaOptions } from '../data/options';
 
 function WorkoutDisplay({ workout, setWorkout, savedWorkouts, setSavedWorkouts }) {
