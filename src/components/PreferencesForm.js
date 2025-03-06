@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import EquipmentSelector from './EquipmentSelector';
 import TargetAreaSelector from './TargetAreaSelector';
 import HealthConsiderationsSelector from './HealthConsiderationsSelector';
@@ -6,16 +6,7 @@ import SavedWorkouts from './SavedWorkouts';
 import { generateWorkout } from '../utils/workoutGenerator';
 import { equipmentOptions, durationOptions, difficultyOptions, restTimeOptions } from '../data/options';
 
-function PreferencesForm({ setWorkout, savedWorkouts, setSavedWorkouts }) {
-  const [preferences, setPreferences] = useState({
-    equipment: [],
-    duration: 30,
-    targetAreas: [],
-    difficultyLevel: 'all',
-    healthConsiderations: [],
-    restTime: 30,
-  });
-  
+function PreferencesForm({ setWorkout, savedWorkouts, setSavedWorkouts, preferences, setPreferences }) {
   const handleDurationChange = (e) => {
     setPreferences(prev => ({
       ...prev,

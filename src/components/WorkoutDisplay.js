@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ExerciseItem from './ExerciseItem';
 import WorkoutTimer from './WorkoutTimer';
 import { saveWorkout } from '../utils/storageUtils';
+import { recordWorkoutHistory } from '../utils/historyUtils';
 import { bodyAreaOptions } from '../data/options';
 
 function WorkoutDisplay({ workout, setWorkout, savedWorkouts, setSavedWorkouts }) {
@@ -11,6 +12,17 @@ function WorkoutDisplay({ workout, setWorkout, savedWorkouts, setSavedWorkouts }
     time: workout.exercises.length > 0 ? workout.exercises[0].duration * 60 : 0,
     currentExerciseIndex: workout.exercises.length > 0 ? 0 : -1,
   });
+  
+  const [workoutComplete, setWorkoutComplete] = useState(false);
+  
+  // Check if workout is complete whenever timer changes
+  useEffect(() => {
+    if (timer.currentExerciseIndex >= workout.exercises.length && timer.currentExerciseIndex !== -1) {
+      setWorkoutComplete(true);
+      // Record workout in history
+      recordWorkoutHistory(workout);
+    }
+  }, [timer.currentExerciseIndex, workout]);
   
   const resetSelections = () => {
     setWorkout(null);
@@ -139,6 +151,18 @@ function WorkoutDisplay({ workout, setWorkout, savedWorkouts, setSavedWorkouts }
           </button>
         </div>
       </div>
+      
+      {workoutComplete && (
+        <div className="p-4 mb-6 bg-green-50 border border-green-200 rounded-lg text-green-800">
+          <div className="flex items-center">
+            <span className="text-2xl mr-3">🎉</span>
+            <div>
+              <h3 className="font-semibold">Workout Complete!</h3>
+              <p className="text-sm">Great job! This workout has been added to your progress history.</p>
+            </div>
+          </div>
+        </div>
+      )}
       
       {hasModifications && (
         <div className="p-3 mb-4 bg-amber-50 text-amber-800 rounded-md border border-amber-200 text-sm">
