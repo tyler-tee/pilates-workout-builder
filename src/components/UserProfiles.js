@@ -1,10 +1,11 @@
+// src/components/UserProfiles.js
 import React, { useState, useEffect } from 'react';
 import { isPremiumUser } from '../data/premiumFeatures';
 import PremiumFeatureModal from './PremiumFeatureModal';
+import featureAccess from '../utils/featureAccess';
 
 function UserProfiles({ onSelectProfile, currentPreferences }) {
   const [profiles, setProfiles] = useState([]);
-  // Only destructure what we need to avoid the unused variable warning
   const [isPremium] = useState(isPremiumUser());
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isAddingProfile, setIsAddingProfile] = useState(false);
@@ -14,6 +15,9 @@ function UserProfiles({ onSelectProfile, currentPreferences }) {
     healthConsiderations: [],
     difficultyLevel: 'beginner'
   });
+
+  // Check access to user profiles feature
+  const profilesAccess = featureAccess.checkAccess('userProfiles', profiles.length);
 
   useEffect(() => {
     // Load profiles from localStorage
@@ -33,7 +37,7 @@ function UserProfiles({ onSelectProfile, currentPreferences }) {
   }, []);
 
   const handleAddProfile = () => {
-    if (!isPremium) {
+    if (profilesAccess.limitReached && !isPremium) {
       setShowPremiumModal(true);
       return;
     }
@@ -73,16 +77,11 @@ function UserProfiles({ onSelectProfile, currentPreferences }) {
   };
 
   const handleSelectProfile = (profile) => {
-    if (!isPremium) {
-      setShowPremiumModal(true);
-      return;
-    }
-    
     onSelectProfile(profile);
   };
 
   const handleSaveCurrentAsProfile = () => {
-    if (!isPremium) {
+    if (profilesAccess.limitReached && !isPremium) {
       setShowPremiumModal(true);
       return;
     }
@@ -92,6 +91,17 @@ function UserProfiles({ onSelectProfile, currentPreferences }) {
       ...currentPreferences
     });
     setIsAddingProfile(true);
+  };
+
+  const handleDeleteProfile = (profileId) => {
+    const updatedProfiles = profiles.filter(profile => profile.id !== profileId);
+    setProfiles(updatedProfiles);
+    
+    try {
+      localStorage.setItem('pilatesPulse_profiles', JSON.stringify(updatedProfiles));
+    } catch (error) {
+      console.error('Failed to update profiles:', error);
+    }
   };
 
   return (
@@ -114,32 +124,51 @@ function UserProfiles({ onSelectProfile, currentPreferences }) {
         </div>
       </div>
       
+      {/* Profile limit indicator for free users */}
+      {!isPremium && profiles.length > 0 && (
+        <div className="text-sm text-gray-500 mb-3">
+          {profiles.length} / {profilesAccess.limit} profiles used
+          {profilesAccess.limitReached && (
+            <span className="ml-2 text-amber-600">
+              (Limit reached)
+            </span>
+          )}
+        </div>
+      )}
+      
       {profiles.length === 0 && !isAddingProfile ? (
         <div className="bg-gray-50 p-4 rounded-md text-center text-gray-500">
-          {isPremium ? (
-            <p>No profiles yet. Add profiles to quickly switch between different settings.</p>
-          ) : (
-            <p><span className="text-yellow-500">⭐</span> Create multiple user profiles with Premium</p>
-          )}
+          <p>Create profiles to quickly switch between different settings.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
           {profiles.map(profile => (
             <div 
               key={profile.id}
-              className="border rounded-md p-3 cursor-pointer hover:bg-blue-50"
-              onClick={() => handleSelectProfile(profile)}
+              className="border rounded-md p-3 hover:bg-blue-50 transition-colors relative"
             >
-              <h3 className="font-medium text-blue-800 mb-1">{profile.name}</h3>
-              <div className="text-xs text-gray-600">
-                <p>
-                  Level: {profile.difficultyLevel.charAt(0).toUpperCase() + profile.difficultyLevel.slice(1)}
-                </p>
-                {profile.healthConsiderations && profile.healthConsiderations.length > 0 && (
+              <button
+                onClick={() => handleDeleteProfile(profile.id)}
+                className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+                aria-label="Delete profile"
+              >
+                ✕
+              </button>
+              <div 
+                className="cursor-pointer pt-2"
+                onClick={() => handleSelectProfile(profile)}
+              >
+                <h3 className="font-medium text-blue-800 mb-1">{profile.name}</h3>
+                <div className="text-xs text-gray-600">
                   <p>
-                    Health: {profile.healthConsiderations.length} considerations
+                    Level: {profile.difficultyLevel.charAt(0).toUpperCase() + profile.difficultyLevel.slice(1)}
                   </p>
-                )}
+                  {profile.healthConsiderations && profile.healthConsiderations.length > 0 && (
+                    <p>
+                      Health: {profile.healthConsiderations.length} considerations
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -178,11 +207,13 @@ function UserProfiles({ onSelectProfile, currentPreferences }) {
         </div>
       )}
       
-      <PremiumFeatureModal
-        isOpen={showPremiumModal}
-        onClose={() => setShowPremiumModal(false)}
-        featureName="User Profiles"
-      />
+      {showPremiumModal && (
+        <PremiumFeatureModal
+          isOpen={showPremiumModal}
+          onClose={() => setShowPremiumModal(false)}
+          featureName="User Profiles"
+        />
+      )}
     </div>
   );
 }
