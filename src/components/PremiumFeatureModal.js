@@ -1,6 +1,6 @@
-// src/components/PremiumFeatureModal.js
 import React from 'react';
-import { isPremiumUser } from '../data/premiumFeatures';
+// Remove the unused import
+// import { isPremiumUser } from '../data/premiumFeatures';
 
 function PremiumFeatureModal({ isOpen, onClose, featureName }) {
   if (!isOpen) return null;

@@ -1,11 +1,11 @@
-// src/components/ProgressTracker.js
 import React, { useState, useEffect } from 'react';
 import { isPremiumUser } from '../data/premiumFeatures';
 import PremiumFeatureModal from './PremiumFeatureModal';
 
 function ProgressTracker() {
   const [workoutHistory, setWorkoutHistory] = useState([]);
-  const [isPremium, setIsPremium] = useState(isPremiumUser());
+  // Only destructure what we need to avoid the unused variable warning
+  const [isPremium] = useState(isPremiumUser());
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [stats, setStats] = useState({
     totalWorkouts: 0,

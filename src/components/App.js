@@ -6,12 +6,13 @@ import WorkoutPrograms from './WorkoutPrograms';
 import ProgressTracker from './ProgressTracker';
 import UserProfiles from './UserProfiles';
 import { loadSavedWorkouts } from '../utils/storageUtils';
-import { isPremiumUser } from '../data/premiumFeatures';
+// Remove isPremiumUser since we're not using it for conditional rendering yet
+// import { isPremiumUser } from '../data/premiumFeatures';
 
 function App() {
   const [workout, setWorkout] = useState(null);
   const [savedWorkouts, setSavedWorkouts] = useState([]);
-  const [isPremium, setIsPremium] = useState(isPremiumUser());
+  // Remove the unused isPremium state
   const [currentView, setCurrentView] = useState('generator'); // 'generator', 'programs', 'progress'
   const [preferences, setPreferences] = useState({
     equipment: [],
@@ -22,10 +23,7 @@ function App() {
     restTime: 30,
   });
   
-  // Check premium status on mount
-  useEffect(() => {
-    setIsPremium(isPremiumUser());
-  }, []);
+  // Remove useEffect that was only setting isPremium
   
   // Load saved workouts on mount
   useEffect(() => {

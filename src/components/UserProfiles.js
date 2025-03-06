@@ -1,11 +1,11 @@
-// src/components/UserProfiles.js
 import React, { useState, useEffect } from 'react';
 import { isPremiumUser } from '../data/premiumFeatures';
 import PremiumFeatureModal from './PremiumFeatureModal';
 
 function UserProfiles({ onSelectProfile, currentPreferences }) {
   const [profiles, setProfiles] = useState([]);
-  const [isPremium, setIsPremium] = useState(isPremiumUser());
+  // Only destructure what we need to avoid the unused variable warning
+  const [isPremium] = useState(isPremiumUser());
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isAddingProfile, setIsAddingProfile] = useState(false);
   const [newProfile, setNewProfile] = useState({
